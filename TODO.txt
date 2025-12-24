@@ -1,0 +1,18 @@
+
+
+- Create Blacklist
+
+- delete Char without clearing
+
+- different sorting 
+
+- clear button (idk seems impossible)
+
+- add tabs page 
+
+
+
+-----
+- implement session time 
+
+- use session time to add to total playtime (to keep it accurate bc logout does not work)

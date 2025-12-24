@@ -1,0 +1,20 @@
+## Interface: 110205, 110207, 120000
+## Title: Character Playtime
+## Notes: Track your playtime across all your characters 
+## Author: Konfuzi
+## Version: 1.0.0
+## RequiredDeps:
+## X-Curse-Project-ID: 999999
+## LoadSavedVariablesFirst: 1
+## SavedVariables: Character_PlaytimeDB, CP_settings
+## SavedVariablesPerCharacter:
+
+# Libraries
+Libs\libs.xml
+
+#Addon files
+Core/CP_Settings.lua
+Core/CP_Utils.lua
+Core/CP_Session.lua
+Core/temp.lua
+Core/CharacterPlaytime.lua
