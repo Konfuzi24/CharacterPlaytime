@@ -6,7 +6,7 @@
 ## RequiredDeps:
 ## X-Curse-Project-ID: 999999
 ## LoadSavedVariablesFirst: 1
-## SavedVariables: Character_PlaytimeDB, CP_settings
+## SavedVariables: Character_PlaytimeDB, CP_settings, CP_sessions
 ## SavedVariablesPerCharacter:
 
 # Libraries

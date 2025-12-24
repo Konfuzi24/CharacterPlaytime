@@ -1,3 +1,6 @@
+-- testfile
+
+
 print("Unix time now:"..time())
 local today=time()
 local dateTbl = {
@@ -6,9 +9,6 @@ local dateTbl = {
 	day = 24,
 }
 print("Unix time now:"..time(dateTbl))
-print("test :"..date("%m/%d/%y %H:%M:%S",today))
-local temp= {
-    name=GetCharname(),
-    time=time(),
-    session_time=0
-}
+test=date("*t",today)
+--print("test :"..date("*t",today))
+print(time({year=test.year, month=test.month, day=test.day}))

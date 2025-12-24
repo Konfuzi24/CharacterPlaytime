@@ -22,6 +22,8 @@ WoW Addon to track and display your playtime across all your Characters.
     - Daily, Weekly... Averages
     - Playtime in specific patches
 
+- Classic WoW Support
+
 - Differnt Sorting options
 
 - Character Blacklist and Deletion
