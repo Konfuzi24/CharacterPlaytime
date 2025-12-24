@@ -14,6 +14,7 @@ WoW Addon to track and display your playtime across all your Characters.
 
 
 ## Screenshots
+<img width="842" height="599" alt="image" src="https://github.com/user-attachments/assets/32765b0c-d53d-4948-9e51-94dc1a0aaaad" />
 
 
 ## Coming Soon
