@@ -4,17 +4,6 @@ print("Character Playtime v"..GetAddOnMetadata("CharacterPlaytime", "Version")..
 
 MyAddon = MyAddon or {}
 
---[[
-local CPmainFrame = CreateFrame("Frame", "CPmainFrame", UIParent, "BasicFrameTemplate")
-CPmainFrame:SetSize(500, 350)
-CPmainFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
-
-CPmainFrame.TitleBg:SetHeight(30)
-CPmainFrame.title = CPmainFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-CPmainFrame.title:SetPoint("TOPLEFT", CPmainFrame.TitleBg, "TOPLEFT", 5, -3)
-CPmainFrame.title:SetText("Character Playtime")
-CPmainFrame:Hide()
---]]
 
 local AceGUI = LibStub("AceGUI-3.0")
 local CPmainFrame = AceGUI:Create("Frame")
@@ -27,67 +16,58 @@ CPmainFrame:Hide()
 local CPScroll = AceGUI:Create("ScrollFrame")
 CPScroll:SetLayout("List")
 CPScroll:SetFullWidth(true)
+
+-- toggle button to hide/show the bars (scroll area)
+-- standalone draggable button (not parented to CPmainFrame)
+local toggleBtnFrame = CreateFrame("Button", "CPToggleButtonFrame", CPmainFrame.frame, "UIPanelButtonTemplate")
+toggleBtnFrame:SetSize(100, 24)
+toggleBtnFrame:SetPoint("TOPRIGHT", CPmainFrame.frame, "TOPLEFT", 0, -10)
+toggleBtnFrame:SetText("Hide bars")
+-- apply dark grey styling: background, highlight and pressed states
+do
+    pcall(function()
+        local nt = toggleBtnFrame.GetNormalTexture and toggleBtnFrame:GetNormalTexture()
+        if nt and nt.SetTexture then nt:SetTexture(nil) end
+        local bt = toggleBtnFrame:CreateTexture(nil, "BACKGROUND")
+        bt:SetAllPoints(toggleBtnFrame)
+        bt:SetColorTexture(0.12, 0.12, 0.12, 1)
+
+        local hl = toggleBtnFrame:CreateTexture(nil, "HIGHLIGHT")
+        hl:SetAllPoints(toggleBtnFrame)
+        hl:SetColorTexture(1,1,1,0.06)
+
+        toggleBtnFrame:SetScript("OnMouseDown", function(self) bt:SetColorTexture(0.08,0.08,0.08,1) end)
+        toggleBtnFrame:SetScript("OnMouseUp", function(self) bt:SetColorTexture(0.12,0.12,0.12,1) end)
+
+        local fs = toggleBtnFrame:GetFontString()
+        if fs and fs.SetTextColor then fs:SetTextColor(1,1,1,1) end
+        if fs and fs.SetFont then fs:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE") end
+    end)
+end
+toggleBtnFrame:SetScript("OnClick", function(self)
+
+    if CPScroll and CPScroll.frame then
+        if CPScroll.frame:IsShown() then
+            CPScroll.frame:Hide()
+            self:SetText("Show bars")
+        else
+            CPScroll.frame:Show()
+            UpdateBars(CPmainFrame, CPScroll, Character_PlaytimeDB, CP_settings)
+            self:SetText("Hide bars")
+        end
+    end
+end)
+
 -- add the scroll area as the single child of the main frame
 CPmainFrame:AddChild(CPScroll)
 
 
--- populate the frame with status bars from the DB
-local function UpdateBars()
-    if not CPmainFrame then return end
-
-    -- Remove existing children in the scroll area (AceGUI handles resource cleanup)
-    CPScroll:ReleaseChildren()
-
-    -- optional temporary header bar / spacer
-    CPScroll:AddChild(Spacer(15))
-
-    -- compute a sensible max value so bars scale relative to the largest playtime
-    local maxTime = 0
-    for _, dat in pairs(Character_PlaytimeDB) do
-        if dat and dat.time and dat.time > maxTime then maxTime = dat.time end
-    end
-    if maxTime == 0 then maxTime = 1 end
-
-    -- add one bar per character, sorted by total playtime (descending)
-    local entries = {}
-    for cha, dat in pairs(Character_PlaytimeDB) do
-        if dat then
-            tinsert(entries, { key = cha, name = dat.name, time = dat.time or 0, class = dat.class })
-        end
-    end
-    table.sort(entries, function(a, b)
-        if a.time == b.time then
-            return (a.name or "") < (b.name or "") -- fallback alphabetical
-        end
-        return a.time > b.time
-    end)
-
-    for i = 1, #entries do
-        local e = entries[i]
-        
-        --CP_settings = CP_settings or {}
-        if CP_settings["log_scaling"]==false or nil then
-            totalBar = CreateStatusBar(CP_settings["bar_height"] or 20, (maxTime), (e.time), e.name or e.key, formatPlaytime(e.time), e.class or "Unknown")
-        end
-        
-        if CP_settings["log_scaling"]==true then
-            totalBar = CreateStatusBar(CP_settings["bar_height"] or 20, math.log10(maxTime), math.log10(e.time), e.name or e.key, formatPlaytime(e.time), e.class or "Unknown")
-        end
-        
-        --local totalBar = CreateStatusBar(20, (maxTime), (e.time), e.name or e.key, formatPlaytime(e.time), e.class or "Unknown")
-        -- store the DB key on the widget so we can refresh it later without rebuilding
-        totalBar.userdata = totalBar.userdata or {}
-        totalBar.userdata.charKey = e.key
-        CPScroll:AddChild(totalBar)
-        CPScroll:AddChild(Spacer(4))
-    end
-end
+-- `UpdateBars` moved to `Core/CP_Utils.lua` and is now parameterized
 
 -- refresh and update values every time the frame is shown
 CPmainFrame:SetCallback("OnShow", function(widget)
     -- rebuild the list (captures added/removed characters and resorting)
-    UpdateBars()
-
+    UpdateBars(CPmainFrame, CPScroll, Character_PlaytimeDB, CP_settings)
     -- then update the numeric values / text so they always reflect current DB
     local maxTime = 0
     local totaltimeallchar=0
@@ -130,14 +110,14 @@ local timeUpdateFrame = CreateFrame("Frame")
 timeUpdateFrame:SetScript("OnEvent", function(self, event, ...)
     if event == "TIME_PLAYED_MSG" then
         if CPmainFrame and CPmainFrame:IsShown() then
-            UpdateBars()
+            UpdateBars(CPmainFrame, CPScroll, Character_PlaytimeDB, CP_settings)
         end
     end
 end)
 timeUpdateFrame:RegisterEvent("TIME_PLAYED_MSG")
 
 -- initial population
-UpdateBars()
+UpdateBars(CPmainFrame, CPScroll, Character_PlaytimeDB, CP_settings)
 
 
 
@@ -168,4 +148,3 @@ function MyAddon:ToggleMainFrame()
         CPmainFrame:Hide()
     end
 end
-

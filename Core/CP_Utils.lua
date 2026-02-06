@@ -244,6 +244,62 @@ function Spacer(height)
 end
 
 
+-- Parameterized UpdateBars moved here so it can be reused from other files.
+-- cpMainFrame: AceGUI frame, cpScroll: AceGUI ScrollFrame, db: Character_PlaytimeDB table, settings: CP_settings table
+function UpdateBars(cpMainFrame, cpScroll, db, settings)
+  if not cpMainFrame or not cpScroll then return end
+
+  -- Remove existing children in the scroll area (AceGUI handles resource cleanup)
+  if cpScroll.ReleaseChildren then cpScroll:ReleaseChildren() end
+
+  -- optional temporary header bar / spacer
+  if cpScroll.AddChild then cpScroll:AddChild(Spacer(15)) end
+
+  -- compute a sensible max value so bars scale relative to the largest playtime
+  local maxTime = 0
+  local source = db or Character_PlaytimeDB or {}
+  for _, dat in pairs(source) do
+      if dat and dat.time and dat.time > maxTime then maxTime = dat.time end
+  end
+  if maxTime == 0 then maxTime = 1 end
+
+  -- add one bar per character, sorted by total playtime (descending)
+  local entries = {}
+  for cha, dat in pairs(source) do
+      if dat then
+          table.insert(entries, { key = cha, name = dat.name, time = dat.time or 0, class = dat.class })
+      end
+  end
+  table.sort(entries, function(a, b)
+      if a.time == b.time then
+          return (a.name or "") < (b.name or "") -- fallback alphabetical
+      end
+      return a.time > b.time
+  end)
+
+  for i = 1, #entries do
+      local e = entries[i]
+      local totalBar
+      local cfg = settings or CP_settings or {}
+
+      if cfg["log_scaling"] == true then
+          -- guard against log10(0)
+          local safeValue = (e.time and e.time > 0) and math.log10(e.time) or 0
+          totalBar = CreateStatusBar(cfg["bar_height"] or 20, math.log10(maxTime), safeValue, e.name or e.key, formatPlaytime(e.time), e.class or "Unknown")
+      else
+          totalBar = CreateStatusBar(cfg["bar_height"] or 20, (maxTime), (e.time), e.name or e.key, formatPlaytime(e.time), e.class or "Unknown")
+      end
+
+      -- store the DB key on the widget so we can refresh it later without rebuilding
+      totalBar.userdata = totalBar.userdata or {}
+      totalBar.userdata.charKey = e.key
+      if cpScroll.AddChild then cpScroll:AddChild(totalBar) end
+      if cpScroll.AddChild then cpScroll:AddChild(Spacer(4)) end
+  end
+end
+
+
+
 -----------------------------------------------------------------------------------------------------
 
 

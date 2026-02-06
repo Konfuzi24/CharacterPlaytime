@@ -1,10 +1,10 @@
-## Interface: 110205, 110207, 120000
+## Interface: 120000, 120001, 11508
 ## Title: Character Playtime
 ## Notes: Track your playtime across all your characters 
 ## Author: Konfuzi
-## Version: 1.0.0
+## Version: 1.0.2
 ## RequiredDeps:
-## X-Curse-Project-ID: 999999
+## X-Curse-Project-ID: 1412628
 ## LoadSavedVariablesFirst: 1
 ## SavedVariables: Character_PlaytimeDB, CP_settings, CP_sessions
 ## SavedVariablesPerCharacter:

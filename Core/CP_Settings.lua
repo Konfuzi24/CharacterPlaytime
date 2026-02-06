@@ -1,6 +1,10 @@
 
 
-CP_settings = CP_settings or {}
+CP_settings = CP_settings or {
+["bar_height"] = 20,
+["log_scaling"] = false,
+["bar_texture"] = 1,
+}
 
 local function OnSettingChanged(_, setting, value)
 	local variable = setting:GetVariable()
