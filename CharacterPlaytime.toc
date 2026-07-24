@@ -1,4 +1,4 @@
-## Interface: 120000, 120001, 120007,120100
+## Interface: 120000, 120001, 120007, 120100
 ## Title: Character Playtime
 ## Notes: Track your playtime across all your characters 
 ## Author: Konfuzi
