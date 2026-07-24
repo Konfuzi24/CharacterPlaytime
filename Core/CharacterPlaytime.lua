@@ -1,6 +1,6 @@
 local GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 
-print("Character Playtime v"..GetAddOnMetadata("CharacterPlaytime", "Version").." successfully loaded!")
+print("Blank Slate Addon / Character Playtime v"..GetAddOnMetadata("CharacterPlaytime", "Version").." successfully loaded!")
 
 MyAddon = MyAddon or {}
 
